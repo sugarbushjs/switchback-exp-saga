@@ -1,8 +1,14 @@
 import { adpStore } from '../components/App'
 import { store } from '../components/App/store'
-import { adaptiveDispatch, adaptiveSagaDispatch } from 'sugarbush'
+import { adaptiveDispatch } from 'sugarbush'
+import { adaptiveSagaDispatch } from 'sugarbush-saga'
+import { SAGA_BYPASS } from '../config/app-globals'
 
-export const sagaDispatch = () => adpStore.dispatchSaga()
+export const SagaDispatch = () => adpStore.dispatchSaga(SAGA_BYPASS)
+export const sagaDispatch2 = () => adaptiveSagaDispatch({ dispatch: store.dispatch, key:''})
 export const SystemDispatch = () => adpStore.dispatch('SystemState')
-export const CounterDispatch = () => adaptiveDispatch({ dispatch: store.dispatch, key: 'CounterState', suppressLogging: true})
-export const sagaAdpDispatch = () => adaptiveSagaDispatch({dispatch: store.dispatch })
+export const CounterDispatch = () => adaptiveDispatch({ dispatch: store.dispatch, key: 'CounterState'})
+
+
+
+

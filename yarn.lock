@@ -9066,6 +9066,16 @@ stylehacks@^5.1.1:
     browserslist "^4.21.4"
     postcss-selector-parser "^6.0.4"
 
+sugarbush-saga@^1.7.1:
+  version "1.7.1"
+  resolved "https://registry.yarnpkg.com/sugarbush-saga/-/sugarbush-saga-1.7.1.tgz#0aaa67f423d7e062d6eb4ffab62cac2be29160fc"
+  integrity sha512-HDxFk3PyneHRlL/Hkxl6moT5zz89ACpJ5vVHKrVzShcgi9tzE2Xzci1KVEfABmrbB9jQb3+zO3VcKeCRouVZ/A==
+
+sugarbush@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/sugarbush/-/sugarbush-2.1.1.tgz#8005bd574c5a360fe1c463e206adaca80278b5ec"
+  integrity sha512-z/YBhIi7iKZPsReqfjZppr59HjGZ19kaZaYCExdHDFSlQSStI532zrigTlecf9bXh8guQSEfmINFb8N2An8wQg==
+
 supports-color@^5.3.0, supports-color@^5.5.0:
   version "5.5.0"
   resolved "https://registry.yarnpkg.com/supports-color/-/supports-color-5.5.0.tgz#e2e69a44ac8772f78a1ec0b35b689df6530efc8f"

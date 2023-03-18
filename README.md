@@ -1,70 +1,119 @@
-# Getting Started with Create React App
+# Switchback Example Saga
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
+This applicaiton uses the Redux Saga created from CRA. When running the app open the developer
+tools (F12) to view the console log. You can change the port from the root env file.
 
-In the project directory, you can run:
+localhost:6003
 
-### `yarn start`
+=================================================================================================================
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+# Sugarbush-Saga
+![logo-sm.png](logo%2Flogo-sm.png)
 
-### `yarn test`
+[Project Source Code](https://github.com/sugarbushjs/sugarbush-saga)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+**Sugarbush** is a performance enhancer for your react-redux application by replacing the Redux
+<u>combinedReducers</u> with `switchback`. Switchback will only run the corresponding reducer that matches
+the dispatched action type. Please read more about npm [sugarbush](https://www.npmjs.com/package/sugarbush)
 
-### `yarn build`
+\
+**Sugarbush-Saga** includes saga helper that works with the Sugarbush switchback,
+`confingureAdaptiveStrore`, `adaptiveSagaDispatch`, and `sbPut` (saga effect)
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Installation
+```
+Minimum Requirements: React: 16.8
+```
+```
+npm install sugarbush-saga
+```
+```
+yarn add sugarbush-saga
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-### `yarn eject`
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## Saga
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+When dispatching Saga actions, the combinedReducers will process all the reducers. With `dispatchSaga` from `configureAdaptiveStore`
+or `adaptiveSagaDispatch` this will not occur. Both functions take two parameters. The first parameter, dispatch, of
+type Redux Dispatch, the second parameter, key, of type string. The key assigned to either method must be unique
+and is used to bypass Sugarbush's switchback. This unique key must also be assigned to Sugarbush's switchback.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### dispatchSaga
+```js
+import { adpStore } from '../components/App'
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+export const sagaDispatch = () => adpStore.dispatchSaga('@@GAGA-BYPASS!')
+```
+> **Note**: The dispatchSaga is a method of the Sugarbush `configureAdaptiveStore`. To set up a configureAdaptiveStore
+> please read about [sugarbush](https://www.npmjs.com/package/sugarbush)
 
-## Learn More
+### adaptiveSagaDispatch
+```js
+import { store } from '../components/App/store'
+import { adaptiveSagaDispatch } from 'sugarbush'
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+export const sagaAdpDispatch = () => adaptiveSagaDispatch({dispatch: store.dispatch, key: '@@GAGA-BYPASS!', versobe: false })
+```
+> **Note**: verbose is optional and is true by default but will be set to false in a production environment.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
 
-### Code Splitting
+### switchback
+The unique saga key assigned to either the dispatchSaga or adaptiveSagaDispatch must also be assigned to switchback. This
+key will prevent switchback from processing any reducers when a saga action is dispatched.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+```js
+const reducers = switchback({
+    SystemState,
+    CounterState,
+    StatusState,
+  }, {sagaBypass: '@@GAGA-BYPASS!'}
+)
+```
+> **Note**: To set up switchback please read [sugarbush](https://www.npmjs.com/package/sugarbush)
 
-### Analyzing the Bundle Size
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## sbPut
 
-### Making a Progressive Web App
+Use the sbPut side effect to run the corresponding reducer with switchback. The sbPut
+wraps the Saga Put effect and adds the reducer’s key to the effect. The sbPut is first initialized with a key representing the reducer listed in switchback. The sbPut reference
+takes two parameters. The first is an action type, type string, and payload of any.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+```js
+import { takeEvery } from 'redux-saga/effects'
+import { sbPut } from 'sugarbush'
+import { SystemActionEnum } from '../actions/system-actions'
 
-### Advanced Configuration
+/** Using the sugarbush-saga effect of sbPut to set the key*/
+const _put = sbPut('SystemState')
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+export function* watchFetchSystemSettings() {
+  yield takeEvery(SystemActionEnum.FETCH_SYSTEM_THEME, fetchSetSystemTheme)
+}
 
-### Deployment
+function* fetchSetSystemTheme() {
+  /** Using the sugarbush-saga effect of sbPut */
+  yield _put(SystemActionEnum.SET_SYSTEM_THEME, 'GREEN')
+}
+```
+\
+Internally the sbPut creates an action type with a key and calls the Saga Put side effect.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+```js
+const _action:IAction = ({type: type, payload: payload, key: key})
+yield put(_action)
+```
 
-### `yarn build` fails to minify
+## Examples:
+* [switchback-example-saga](https://github.com/sugarbushjs/switchback-exp-saga)
+* [switchback-example-classic](https://github.com/sugarbushjs/switchback-example-classic)
+* [switchback-example-toolkit](https://github.com/sugarbushjs/switchback-example-toolkit)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+## License
+
+[MIT](LICENSE.md)

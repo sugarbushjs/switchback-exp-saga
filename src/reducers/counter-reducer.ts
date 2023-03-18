@@ -1,5 +1,4 @@
-import { toast } from 'react-toastify'
-import { CounterActionEnum, CounterActions } from '../actions/counter-actions'
+import { CounterActionEnum } from '../actions/counter-actions'
 import { Message } from '../components/UI/Message'
 import { defaultCounterState, counterType } from '../models/counter-model'
 
